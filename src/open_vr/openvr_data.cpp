@@ -563,6 +563,7 @@ void openvr_data::process() {
 
 	// update our poses structure, this tracks our controllers
 	vr::TrackedDevicePose_t tracked_device_pose[vr::k_unMaxTrackedDeviceCount];
+	vr::TrackedDevicePose_t tracked_device_next_pose[vr::k_unMaxTrackedDeviceCount];
 
 	if (get_application_type() == openvr_data::OpenVRApplicationType::OVERLAY || get_application_type() == openvr_data::OpenVRApplicationType::BACKGROUND) {
 		openvr_data::OpenVRTrackingUniverse tracking_universe = get_tracking_universe();
@@ -572,6 +573,9 @@ void openvr_data::process() {
 			vr::VRSystem()->GetDeviceToAbsoluteTrackingPose(vr::TrackingUniverseStanding, 0.0, tracked_device_pose, vr::k_unMaxTrackedDeviceCount);
 		} else {
 			vr::VRSystem()->GetDeviceToAbsoluteTrackingPose(vr::TrackingUniverseRawAndUncalibrated, 0.0, tracked_device_pose, vr::k_unMaxTrackedDeviceCount);
+		}
+		for (int i = 0; i < vr::k_unMaxTrackedDeviceCount; i++) {
+			tracked_device_next_pose[i] = tracked_device_pose[i];
 		}
 	} else {
 		// Get the predicted game poses for this frame when we called WaitGetPoses right before rendering
