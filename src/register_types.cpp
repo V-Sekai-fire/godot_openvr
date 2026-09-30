@@ -13,6 +13,7 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/core/defs.hpp>
 #include <godot_cpp/godot.hpp>
+#include <godot_cpp/variant/callable_method_pointer.hpp>
 #include <godot_cpp/variant/utility_functions.hpp>
 
 #include "OpenVRSkeleton.h"
@@ -22,10 +23,19 @@
 
 using namespace godot;
 
-// The interface is added to the XR server here, on extension load, so no
-// GDScript autoload is needed. godot#64975 once blocked this; on Godot 4.x the
-// XRServer singleton is live at scene-init, so we instantiate and register it.
+// The interface is added to the XR server on extension load, so no GDScript
+// autoload is needed. XRServer may not be live yet at scene-init on some builds
+// (godot#64975); when it is missing we add on the first frame via a deferred
+// call, by which time the server exists.
 static Ref<XRInterfaceOpenVR> openvr_interface;
+
+static void add_openvr_interface() {
+	XRServer *xr_server = XRServer::get_singleton();
+	if (xr_server != nullptr && !openvr_interface.is_valid()) {
+		openvr_interface.instantiate();
+		xr_server->add_interface(openvr_interface);
+	}
+}
 
 void initialize_gdextension_types(ModuleInitializationLevel p_level) {
 	if (p_level != MODULE_INITIALIZATION_LEVEL_SCENE) {
@@ -39,10 +49,10 @@ void initialize_gdextension_types(ModuleInitializationLevel p_level) {
 	// Virtual classes
 	ClassDB::register_class<OpenVREventHandler>(true);
 
-	XRServer *xr_server = XRServer::get_singleton();
-	if (xr_server != nullptr) {
-		openvr_interface.instantiate();
-		xr_server->add_interface(openvr_interface);
+	if (XRServer::get_singleton() != nullptr) {
+		add_openvr_interface();
+	} else {
+		callable_mp_static(add_openvr_interface).call_deferred();
 	}
 }
 
