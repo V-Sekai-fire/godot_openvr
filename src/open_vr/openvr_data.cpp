@@ -24,6 +24,7 @@ openvr_data::openvr_data() {
 	use_count = 1;
 	hmd = nullptr;
 	render_models = nullptr;
+	vrevent_handler = nullptr;
 
 	application_type = OpenVRApplicationType::SCENE;
 	tracking_universe = OpenVRTrackingUniverse::STANDING;
