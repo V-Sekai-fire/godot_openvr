@@ -21,6 +21,7 @@ opts.AddVariables(
     BoolVariable('use_llvm', "Use the LLVM compiler", 'no'),
     BoolVariable("use_static_cpp", "Link MinGW/MSVC C++ runtime libraries statically", True),
     EnumVariable('bits', "CPU architecture", '64', ['32', '64']),
+    EnumVariable('precision', "Floating-point precision (must match the engine)", 'single', ['single', 'double']),
 )
 
 # Options for locating the OpenVR library
@@ -140,6 +141,12 @@ if debug:
     env.Append(CPPDEFINES=["DEBUG_ENABLED", "DEBUG_METHODS_ENABLED"])
 else:
     godot_cpp_library += '.template_release'
+
+# Double precision must match the engine (Vector3/Transform3D layouts), or the
+# extension crashes on load. godot-cpp names its double lib with the .double tag.
+if env['precision'] == 'double':
+    godot_cpp_library += '.double'
+    env.Append(CPPDEFINES=['REAL_T_IS_DOUBLE'])
 
 godot_cpp_library += f'.{arch}'
 

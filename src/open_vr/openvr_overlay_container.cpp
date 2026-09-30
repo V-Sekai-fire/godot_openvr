@@ -285,7 +285,7 @@ float OpenVROverlayContainer::get_overlay_width_in_meters() {
 	return overlay_width_in_meters;
 }
 
-void OpenVROverlayContainer::set_overlay_width_in_meters(real_t p_new_size) {
+void OpenVROverlayContainer::set_overlay_width_in_meters(float p_new_size) {
 	overlay_width_in_meters = p_new_size;
 
 	if (overlay) {
