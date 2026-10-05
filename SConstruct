@@ -105,7 +105,7 @@ if env['platform'] == 'windows':
         env["is_msvc"] = True
         env.Append(CPPDEFINES=["WIN32", "_WIN32", "_WINDOWS", "_CRT_SECURE_NO_WARNINGS", "TYPED_METHOD_BIND"])
         env.Append(CCFLAGS=["-W3", "-GR"])
-        env.Append(CXXFLAGS=["-std:c++17"])
+        env.Append(CXXFLAGS=["-std:c++17", "-Zc:__cplusplus"])
         if debug:
             env.Append(CCFLAGS = ['-EHsc', '-ZI', '-FS'])
             env.Append(LINKFLAGS = ['-DEBUG'])
