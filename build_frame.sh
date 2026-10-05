@@ -11,7 +11,7 @@ w() { command -v cygpath >/dev/null 2>&1 && cygpath -w "$1" || echo "$1"; }
 
 mkdir -p "$HERE/build"
 ( cd "$HERE/build" && "$GODOT_ENGINE" --headless --dump-extension-api )
-[ -f "$HERE/openvr/headers/openvr_mingw.hpp" ] || ( cd "$HERE/openvr/headers" && python "$HERE/misc/openvr_mingw_gen.py" )
+[ -f "$HERE/thirdparty/openvr_mingw/openvr_mingw.hpp" ] || ( cd "$HERE/thirdparty/openvr/headers" && python "$HERE/misc/openvr_mingw_gen.py" && mv openvr_mingw.hpp "$HERE/thirdparty/openvr_mingw/" )
 ( cd "$HERE/godot-cpp" && scons platform=windows target=template_debug arch=x86_64 precision=double \
     use_mingw=yes custom_api_file="$(w "$HERE/build/extension_api.json")" -j"${JOBS:-6}" )
 ( cd "$HERE" && scons platform=windows target=debug bits=64 precision=double use_mingw=yes -j"${JOBS:-6}" )

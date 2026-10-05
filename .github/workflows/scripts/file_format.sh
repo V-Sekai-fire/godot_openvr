@@ -15,7 +15,7 @@ IFS=$'\n\t'
 git grep -zIl '' |
 while IFS= read -rd '' f; do
     # Exclude 3rd party files
-    if [[ "$f" == "openvr"* ]]; then
+    if [[ "$f" == "thirdparty"* ]]; then
         continue
     elif [[ "$f" == "godot-cpp"* ]]; then
         continue
