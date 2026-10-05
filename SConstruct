@@ -26,8 +26,8 @@ opts.AddVariables(
 
 # Options for locating the OpenVR library
 opts.AddVariables(
-    BoolVariable('builtin_openvr', "Use OpenVR library from submodule instead of system-provided", 'yes'),
-    PathVariable('openvr_path', 'The path where the OpenVR repo is located, if builtin_openvr is used', 'openvr/'),
+    BoolVariable('builtin_openvr', "Use OpenVR library from the vendored subtree instead of system-provided", 'yes'),
+    PathVariable('openvr_path', 'The path where the OpenVR repo is located, if builtin_openvr is used', 'thirdparty/openvr/'),
 )
 
 # Other needed paths
@@ -105,7 +105,7 @@ if env['platform'] == 'windows':
         env["is_msvc"] = True
         env.Append(CPPDEFINES=["WIN32", "_WIN32", "_WINDOWS", "_CRT_SECURE_NO_WARNINGS", "TYPED_METHOD_BIND"])
         env.Append(CCFLAGS=["-W3", "-GR"])
-        env.Append(CXXFLAGS=["-std:c++17"])
+        env.Append(CXXFLAGS=["-std:c++17", "-Zc:__cplusplus"])
         if debug:
             env.Append(CCFLAGS = ['-EHsc', '-ZI', '-FS'])
             env.Append(LINKFLAGS = ['-DEBUG'])
@@ -163,6 +163,10 @@ env.Append(CPPPATH=[
 # Add our godot-cpp library
 env.Append(LIBPATH=[godot_cpp_path + 'bin/'])
 env.Append(LIBS=[godot_cpp_library])
+
+# The C-table header generated from the vendored openvr.h, for mingw builds
+if env['use_mingw'] and env['builtin_openvr']:
+    env.Append(CPPPATH=['thirdparty/openvr_mingw/'])
 
 # Add openvr_api, either from the system or the provided path
 if not env['builtin_openvr']:
