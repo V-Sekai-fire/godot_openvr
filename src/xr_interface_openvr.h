@@ -81,5 +81,4 @@ public:
 };
 } // namespace godot
 
-
 #endif /* !XR_INTERFACE_OPENVR_H */

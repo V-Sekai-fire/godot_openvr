@@ -21,15 +21,11 @@ This repo currently maintains the following branches:
 
 # Building
 
-## Submodules
-After cloning this repo, you should run:
+## Vendored dependencies
+These are vendored as squashed git subtrees, so a clone needs no submodule step:
 
-	git submodule update --init --recursive
-
-We use the following submodules:
-
-* [godot-cpp](https://github.com/godotengine/godot-cpp): C++ bindings to Godot's internal classes. This has a submodule of its own, godot-headers.
-* [OpenVR](https://github.com/ValveSoftware/openvr): the repository maintained by Valve that contains the OpenVR SDK used to interact with the OpenVR/SteamVR platform.
+* [godot-cpp](https://github.com/godotengine/godot-cpp) in `godot-cpp/`: C++ bindings to Godot's internal classes.
+* [OpenVR](https://github.com/ValveSoftware/openvr) in `thirdparty/openvr/`: the repository maintained by Valve that contains the OpenVR SDK used to interact with the OpenVR/SteamVR platform. See `thirdparty/README.md` for its version and licence.
 
 The godot-cpp module is pointed at the branch corresponding to the specific release of Godot that we're currently supporting. 2.x of this extension has only been tested with OpenVR 2.0+.
 
@@ -38,11 +34,11 @@ OpenVR can also be stored elsewhere using the `openvr_path=` build argument, or 
 ## Compiling
 SCons is used for compiling this module. This is also the build mechanism for Godot and information on installing it on various platforms can be found in [the Godot documentation](https://docs.godotengine.org/en/stable/contributing/development/compiling/introduction_to_the_buildsystem.html).
 
-You must compile the `godot-cpp` submodule first by executing:
+You must compile `godot-cpp` first by executing:
 
 	cd godot-cpp
-	scons platform=windows target=template_release generate_bindings=yes arch=x86_64
-	scons platform=windows target=template_debug arch=x86_64
+	scons platform=windows target=template_release generate_bindings=yes arch=x86_64 api_version=4.7
+	scons platform=windows target=template_debug arch=x86_64 api_version=4.7
 	cd ..
 
 You can then compile this extension by executing:
@@ -63,8 +59,8 @@ There are many CLI flags that can be given to scons to manipulate how the extens
 * `use_llvm`: Use the LLVM compiler (clang).
 * `use_static_cpp`: Link MinGW/MSVC C++ runtime libraries statically. Defaults to `yes` to simplify distribution and match godot-cpp.
 * `bits`: `32` or `64`. Target CPU architecture, defaults to 64.
-* `builtin_openvr`: Use the OpenVR library from our submodule. Defaults to `yes`, see below for how to use a system OpenVR.
-* `openvr_path`: The path where the OpenVR repo is located, if `builtin_openvr` is used. Defaults to `openvr/`.
+* `builtin_openvr`: Use the OpenVR library from the vendored subtree. Defaults to `yes`, see below for how to use a system OpenVR.
+* `openvr_path`: The path where the OpenVR repo is located, if `builtin_openvr` is used. Defaults to `thirdparty/openvr/`.
 
 Setting `builtin_openvr=no` will cause pkg-config to be invoked to search for a `libopenvr_api` installed on your system. pkg-config normally only exists on Linux systems, but can be installed on Windows using the mingw toolchain.
 
@@ -110,7 +106,7 @@ https://support.microsoft.com/en-au/help/2977003/the-latest-supported-visual-c-d
 
 ### mingw
 
-Building on Windows under mingw means using the gcc c++ compiler. Because C++ does not have a stable ABI, the resulting binary cannot actually communicate successfully with SteamVR using the OpenVR C++ bindings. The fix for this is a header patch using [a script written by tunabrain](https://gist.github.com/tunabrain/1fc7a4964914d61b5ae751d0c84f2382). This script rewrites the C++ header to call the OpenVR C bindings internally, sidestepping the ABI mismatch. We do not currently attempt to run this script as part of our build, it is up to you to produce a patched header if using the submoduled libopenvr_api.
+Building on Windows under mingw means using the gcc c++ compiler. Because C++ does not have a stable ABI, the resulting binary cannot actually communicate successfully with SteamVR using the OpenVR C++ bindings. The fix for this is a header patch using [a script written by tunabrain](https://gist.github.com/tunabrain/1fc7a4964914d61b5ae751d0c84f2382). This script rewrites the C++ header to call the OpenVR C bindings internally, sidestepping the ABI mismatch. A header patched from the vendored `openvr.h` is kept in `thirdparty/openvr_mingw/` and is on the include path when `use_mingw` and `builtin_openvr` are both set; `misc/openvr_mingw_gen.py` regenerates it.
 
 When `use_mingw` is set, `USE_OPENVR_MINGW_HEADER` is exported during the build which will cause `openvr_mingw.hpp` to be included where `openvr.h` would be normally. You may place this file anywhere you like in the header search path.
 

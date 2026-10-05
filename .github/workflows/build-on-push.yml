@@ -21,8 +21,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-      with:
-        submodules: 'recursive'
 
     - name: Install dependencies (Ubuntu)
       run: |
@@ -41,11 +39,11 @@ jobs:
 
     - name: Run the build for godot-cpp
       run: |
-        scons -C godot-cpp platform=${{ matrix.platform }} -j2 target=template_release generate_bindings=yes bits=64
+        scons -C godot-cpp platform=${{ matrix.platform }} -j4 target=template_release generate_bindings=yes api_version=4.7 arch=x86_64
 
     - name: Run the build for godot_openvr
       run: |
-        scons platform=${{ matrix.platform }} -j2 target=release bits=64
+        scons platform=${{ matrix.platform }} -j4 target=release bits=64
 
     # There's no option to preserve the path structure on the upload action, so we just
     # treat each asset as its respective bin/ subfolder and put it in the right place in
