@@ -28,7 +28,7 @@ void XRInterfaceOpenVR::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("is_dashboard_visible"), &XRInterfaceOpenVR::is_dashboard_visible);
 	ClassDB::bind_method(D_METHOD("get_application_key"), &XRInterfaceOpenVR::get_application_key);
 
-	ClassDB::bind_method(D_METHOD("play_area_available"), &XRInterfaceOpenVR::play_area_available);
+	ClassDB::bind_method(D_METHOD("play_area_available"), &XRInterfaceOpenVR::play_area_available);
 
 	ClassDB::bind_method(D_METHOD("get_tracked_device_property", "device_index", "property_id"), &XRInterfaceOpenVR::get_tracked_device_property);
 
